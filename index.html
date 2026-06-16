@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aditama Mitra Seraya</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <style>
+        :root {
+            --primary-navy: #2B2A5E; /* From Logo */
+            --primary-yellow: #DDB03E; /* From Logo */
+            --bg-light: #f9f9f9;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- Navigation --- */
+        header {
+            background-color: var(--text-light);
+            padding: 10px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo img {
+            max-height: 50px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--primary-navy);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary-yellow);
+        }
+
+        .btn-cta {
+            background-color: var(--primary-yellow);
+            color: var(--primary-navy) !important;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-cta:hover {
+            background-color: #c49a34;
+            color: var(--text-light) !important;
+        }
+
+        /* Mobile Menu Setup */
+        .menu-btn { display: none; }
+        .menu-icon { display: none; cursor: pointer; user-select: none; }
+        .navicon { background: var(--primary-navy); display: block; height: 3px; position: relative; width: 25px; transition: background .2s ease-out; }
+        .navicon:before, .navicon:after { background: var(--primary-navy); content: ''; display: block; height: 100%; position: absolute; width: 100%; transition: all .2s ease-out; }
+        .navicon:before { top: 8px; }
+        .navicon:after { top: -8px; }
+
+        /* --- General Sections --- */
+        section {
+            padding: 80px 50px;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-navy);
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .text-center {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            background: linear-gradient(rgba(43, 42, 94, 0.85), rgba(43, 42, 94, 0.85)), 
+                        url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: var(--text-light);
+            text-align: center;
+            padding: 150px 20px;
+        }
+
+        .hero h1 {
+            color: var(--primary-yellow);
+            font-size: 3.5rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        /* --- Grid Container --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--text-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary-yellow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        ul.service-list {
+            list-style-type: square;
+            margin-left: 20px;
+            color: #555;
+        }
+
+        /* --- Portfolio Section --- */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .portfolio-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, var(--primary-navy));
+            color: var(--text-light);
+            padding: 20px;
+        }
+
+        /* --- Utilities --- */
+        .bg-light-section {
+            background-color: var(--bg-light);
+        }
+
+        /* --- Contact Form --- */
+        .contact-container {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .contact-info p {
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        button[type="submit"] {
+            background-color: var(--primary-navy);
+            color: var(--text-light);
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-yellow);
+            color: var(--primary-navy);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        /* --- Media Queries --- */
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; }
+            .logo img { max-height: 40px; }
+            .menu-icon { display: block; padding: 20px 0; }
+            
+            nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--text-light);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+
+            .menu-btn:checked ~ nav { display: block; }
+            .menu-btn:checked ~ .menu-icon .navicon { background: transparent; }
+            .menu-btn:checked ~ .menu-icon .navicon:before { transform: rotate(-45deg); top: 0; }
+            .menu-btn:checked ~ .menu-icon .navicon:after { transform: rotate(45deg); top: 0; }
+
+            nav ul { flex-direction: column; align-items: stretch; gap: 0; }
+            nav a { display: block; padding: 15px 20px; border-bottom: 1px solid #f0f0f0; }
+            nav a.btn-cta { border-radius: 0; text-align: center; background-color: var(--primary-yellow); }
+
+            .hero { padding: 100px 20px; }
+            .hero h1 { font-size: 2.2rem; }
+            section { padding: 50px 20px; }
+            .contact-container { flex-direction: column; gap: 30px; }
+            form { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="ams_logo.png" alt="Aditama Mitra Seraya">
+        </div>
+        
+        <input class="menu-btn" type="checkbox" id="menu-btn" />
+        <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+        
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#why-us">Why Us</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact" class="btn-cta">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Aditama Mitra Seraya</h1>
+        <p>We are a team of creative professionals dedicated to fostering business growth. We help startups scale rapidly and assist established companies in achieving sustained growth.</p>
+        <a href="#contact" class="btn-cta">Start Your Project</a>
+    </section>
+
+    <section id="about">
+        <div class="text-center">
+            <h2>Our Vision & Mission</h2>
+            <p>Leveraging our extensive experience and expertise, we are poised to be your strategic partner in realizing your business vision.</p>
+        </div>
+        <div class="grid-container">
+            <div class="card">
+                <div class="card-content">
+                    <h3>Our Vision</h3>
+                    <p>To deliver comprehensive business solutions, from brand building to project execution, ensuring the highest quality and customer satisfaction.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <h3>Our Mission</h3>
+                    <p>To streamline our clients' business processes by providing a full range of premium services, enabling them to achieve their goals efficiently.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <h3>DKPro</h3>
+                    <p>DKPro stands for "Develop and Kickstart Production". We transform creative ideas into tangible, innovative products.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="bg-light-section">
+        <div class="text-center">
+            <h2>Our Services</h2>
+            <p>From stunning wallpapers to durable stickers, we print it all.</p>
+        </div>
+        <div class="grid-container">
+            <div class="card">
+                <img src="campaign-creators-gMsnXqILjp4-unsplash.jpg" alt="Business Consultation" class="card-img">
+                <div class="card-content">
+                    <h3>Business & Branding</h3>
+                    <ul class="service-list">
+                        <li>Business Ideation and Implementation</li>
+                        <li>Business Consultations</li>
+                        <li>Branding - Rebranding</li>
+                        <li>Business Revamp</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card">
+                <img src="swello-W9GU3yFr5tc-unsplash.jpg" alt="IT Services" class="card-img">
+                <div class="card-content">
+                    <h3>Information Technology</h3>
+                    <ul class="service-list">
+                        <li>Custom IT Development</li>
+                        <li>IT Support and Maintenance</li>
+                        <li>System Integration</li>
+                        <li>Online Presence</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card">
+                <img src="bank-phrom-Tzm3Oyu_6sk-unsplash.jpg" alt="Printing Services" class="card-img">
+                <div class="card-content">
+                    <h3>Large Format Printing</h3>
+                    <ul class="service-list">
+                        <li>Banners & Backlit Films</li>
+                        <li>Custom Wallpaper & Sticker</li>
+                        <li>Textile & Custom Printings</li>
+                        <li>Custom Apparels & Uniforms</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-us">
+        <div class="text-center">
+            <h2>Why Us?</h2>
+            <p>Our team ensures flawless installation, bringing your vision to life.</p>
+        </div>
+        <div class="grid-container">
+            <div class="card text-center" style="border-top: none; border-bottom: 4px solid var(--primary-navy);">
+                <div class="card-content">
+                    <h3>Quality</h3>
+                    <p>We use high-quality materials and advanced printing techniques.</p>
+                </div>
+            </div>
+            <div class="card text-center" style="border-top: none; border-bottom: 4px solid var(--primary-navy);">
+                <div class="card-content">
+                    <h3>Customization</h3>
+                    <p>Tailored solutions to fit your specific needs.</p>
+                </div>
+            </div>
+            <div class="card text-center" style="border-top: none; border-bottom: 4px solid var(--primary-navy);">
+                <div class="card-content">
+                    <h3>Expertise</h3>
+                    <p>Our experienced team delivers exceptional results.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="portfolio" class="bg-light-section">
+        <div class="text-center">
+            <h2>Our Works</h2>
+            <p>A glimpse into our successful projects and satisfied clients.</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-item">
+                <img src="zie.png" alt="Zee Boutique">
+                <div class="portfolio-overlay">
+                    <h3>Zee Boutique</h3>
+                    <p>Branding & Wallpaper</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="simling.png" alt="SIM Keliling">
+                <div class="portfolio-overlay">
+                    <h3>SIM Keliling</h3>
+                    <p>Rebrand & Custom Sticker</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="kai.png" alt="KAI Logistics">
+                <div class="portfolio-overlay">
+                    <h3>KAI Logistics</h3>
+                    <p>Branding and sticker covering</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="chem.png" alt="HQ Chemical Plant">
+                <div class="portfolio-overlay">
+                    <h3>HQ Chemical Plant</h3>
+                    <p>Media Board & Sticker</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="text-center">
+            <h2>Let's Work Together</h2>
+            <p>Ready to transform your spaces and elevate your brand? Get in touch today.</p>
+        </div>
+        <div class="contact-container">
+            <div class="contact-info">
+                <p><strong>Email:</strong> business@amseraya.com</p>
+                <p><strong>Contact center:</strong> +62 858-1010-9090</p>
+
+                
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80" alt="Team Collaboration" style="margin-top: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            </div>
+            
+            <div class="contact-form">
+                <form action="https://hook.eu2.make.com/uef1iz4ypexghscdecktwi2j2roxw27m" method="POST">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="tel" name="phone" placeholder="Your Phone Number" required>
+                    <input type="text" name="subject" placeholder="Subject" required>
+                    <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+                    
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAACvoV0g5EFX4zhnU"></div>
+                    
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Aditama Mitra Seraya (AMS) & DKPro. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
