@@ -490,7 +490,7 @@
             </div>
             
             <div class="contact-form">
-                <form action="https://hook.eu2.make.com/uef1iz4ypexghscdecktwi2j2roxw27m" method="POST">
+                <form id="contactForm">
                     <input type="text" name="name" placeholder="Your Name" required>
                     <input type="email" name="email" placeholder="Your Email" required>
                     <input type="tel" name="phone" placeholder="Your Phone Number" required>
@@ -506,9 +506,65 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 PT. Aditama Mitra Seraya. All rights reserved.<br>Registered no AHU-0089331.AH.01.01.TAHUN 2023</p>
+        <p>&copy; 2026 PT. Aditama Mitra Seraya. All rights reserved.<br>Registered no AHU-0089331.AH.01.01.TAHUN 2023
+		</p>
     </footer>
 
-    
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent standard HTTP form action
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Turnstile response token is automatically appended to FormData
+            const turnstileResponse = formData.get('cf-turnstile-response');
+            
+            if (!turnstileResponse) {
+                alert('Please complete the Captcha to send your message.');
+                return;
+            }
+
+            // UX Update to show sending state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerText;
+            submitBtn.innerText = 'Sending...';
+            submitBtn.disabled = true;
+
+            try {
+                // INSERT YOUR WEBHOOK URL BELOW
+                const webhookUrl = 'https://hook.eu2.make.com/uef1iz4ypexghscdecktwi2j2roxw27m';
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    // Send form data including turnstile response to backend for validation
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Your message has been sent successfully!');
+                    form.reset();
+                    // Reset turnstile widget upon successful submit
+                    if (window.turnstile) {
+                        turnstile.reset();
+                    }
+                } else {
+                    alert('There was a problem sending your message. Please try again.');
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('An error occurred. Please try again later.');
+            } finally {
+                // Restore button state
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+
 </body>
 </html>
