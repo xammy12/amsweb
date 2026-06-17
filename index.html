@@ -499,7 +499,9 @@
                     
                     <div class="cf-turnstile" data-sitekey="0x4AAAAAACvoV0g5EFX4zhnU"></div>
                     
-                    <button type="submit">Send Message</button>
+                    <div id="formStatus" style="display: none;"></div>
+
+                    <button type="submit" id="submitBtn">Send Message</button>
                 </form>
             </div>
         </div>
@@ -511,60 +513,97 @@
     </footer>
 
     <script>
-        document.getElementById('contactForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Prevent standard HTTP form action
-            
-            const form = e.target;
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Turnstile response token is automatically appended to FormData
-            const turnstileResponse = formData.get('cf-turnstile-response');
-            
-            if (!turnstileResponse) {
-                alert('Please complete the Captcha to send your message.');
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const formStatus = document.getElementById('formStatus');
 
-            // UX Update to show sending state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerText;
-            submitBtn.innerText = 'Sending...';
-            submitBtn.disabled = true;
+            // --- WEBHOOK CONFIGURATION ---
+            const WEBHOOK_URL = 'https://hook.eu2.make.com/uef1iz4ypexghscdecktwi2j2roxw27m'; 
 
-            try {
-                // INSERT YOUR WEBHOOK URL BELOW
-                const webhookUrl = 'https://hook.eu2.make.com/uef1iz4ypexghscdecktwi2j2roxw27m';
-                
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    // Send form data including turnstile response to backend for validation
-                    body: JSON.stringify(data)
-                });
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-                if (response.ok) {
-                    alert('Your message has been sent successfully!');
-                    form.reset();
-                    // Reset turnstile widget upon successful submit
-                    if (window.turnstile) {
-                        turnstile.reset();
-                    }
-                } else {
-                    alert('There was a problem sending your message. Please try again.');
+                // 1. Validate Turnstile
+                const formData = new FormData(form);
+                const turnstileResponse = formData.get('cf-turnstile-response');
+
+                if (!turnstileResponse) {
+                    showStatus('Please complete the security check.', 'error');
+                    return;
                 }
-            } catch (error) {
-                console.error('Submission error:', error);
-                alert('An error occurred. Please try again later.');
-            } finally {
-                // Restore button state
-                submitBtn.innerText = originalBtnText;
-                submitBtn.disabled = false;
+
+                // 2. Prepare Data for Webhook
+                const payload = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    subject: formData.get('subject'),
+                    message: formData.get('message'),
+                    cf_turnstile_response: turnstileResponse 
+                };
+
+                // UI Loading State
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = 'Sending...';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.75';
+                submitBtn.style.cursor = 'not-allowed';
+                formStatus.style.display = 'none';
+
+                try {
+                    // 3. Post to Webhook
+                    const response = await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        showStatus('Your message has been sent successfully!', 'success');
+                        form.reset();
+                        // Reset turnstile widget after successful submission
+                        if (typeof turnstile !== 'undefined') {
+                            turnstile.reset();
+                        }
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Webhook Error:', error);
+                    showStatus('Error: Failed to transmit. Is the webhook URL correct?', 'error');
+                } finally {
+                    // Restore UI State
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+            });
+
+            // Helper function to display messages formatted for this theme
+            function showStatus(message, type) {
+                formStatus.textContent = message;
+                formStatus.style.display = 'block';
+                formStatus.style.padding = '15px';
+                formStatus.style.marginTop = '10px';
+                formStatus.style.borderRadius = '4px';
+                formStatus.style.fontWeight = '600';
+                
+                if (type === 'success') {
+                    formStatus.style.backgroundColor = '#e6f4ea';
+                    formStatus.style.color = '#1e8e3e';
+                    formStatus.style.border = '1px solid #ceead6';
+                } else {
+                    formStatus.style.backgroundColor = '#fce8e6';
+                    formStatus.style.color = '#d93025';
+                    formStatus.style.border = '1px solid #fad2cf';
+                }
             }
         });
     </script>
-
 </body>
 </html>
